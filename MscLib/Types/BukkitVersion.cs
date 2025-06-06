@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace MscLib.Types {
     public class BukkitVersion {
         internal protected static BukkitVersion[] BukkitVersions { get; private set; }
-        private static string APIBaseURL = "https://api.papermc.io/v2/";
+        private static readonly string APIBaseURL = "https://api.papermc.io/v2/";
         internal protected static async Task LoadVersionsAsync() {
             try {
                 var data = await RestClient.GetAsync($"{APIBaseURL}projects/paper");
@@ -35,7 +35,7 @@ namespace MscLib.Types {
         private int Patch;
         private int Build;
 
-        internal BukkitVersion(string version) {
+        public BukkitVersion(string version) {
             VersionString = version;
             string[] parts = VersionString.Split('.');
             Major = int.Parse(parts[0]);
@@ -56,7 +56,7 @@ namespace MscLib.Types {
             return Build;
         }
 
-        internal protected async Task SetBuildAsync() {
+        public async Task SetBuildAsync() {
             Build = await GetBuildAsync(this);
         }
 

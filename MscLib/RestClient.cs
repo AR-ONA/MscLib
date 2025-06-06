@@ -19,5 +19,9 @@ namespace MscLib {
                 throw new HttpRequestException($"Request failed: {ex.Message}", ex);
             }
         }
+
+        //public static async Task<File> DownloadAsync(string url) {
+        //    return new File()
+        //}
     }
 }
