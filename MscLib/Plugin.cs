@@ -1,14 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using MscLib.Types;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MscLib.Types {
+namespace MscLib {
     public class Plugin {
         private static readonly string APIBaseURL = "https://api.modrinth.com/v2";
+        public PluginVersion[] PluginVersions { get; internal set; }
 
         public async static Task<Plugin[]> SearchPluginsAsync(
             string query,
@@ -32,6 +29,8 @@ namespace MscLib.Types {
                 : Array.Empty<Plugin>();
         }
 
+        public bool IsDownloaded { get; internal set; } = false;
+
         [JsonProperty("project_id")]
         public string Id { get; internal set; }
         [JsonProperty("title")]
@@ -47,23 +46,16 @@ namespace MscLib.Types {
             Author = author;
         }
 
-        public async Task<BukkitVersion[]> GetVersionList() {
+        public async Task<PluginVersion[]> GetVersionListAsync() {
             var response = await RestClient.GetAsync($"{APIBaseURL}/project/{Id}/version");
-            Console.WriteLine(response);
-            var versions = JArray.Parse(response)
-                .SelectMany(v => v["game_versions"] ?? new JArray())
-                .Where(v => v.Type == JTokenType.String && !string.IsNullOrWhiteSpace(v.ToString()))
-                .Select(v => new BukkitVersion(v.ToString()))
-                .Distinct()
-                .ToArray();
-
-            return versions;
+            if (string.IsNullOrEmpty(response)) return Array.Empty<PluginVersion>();
+            return JsonConvert.DeserializeObject<List<PluginVersion>>(response).ToArray();
         }
 
-        public async Task DownloadAsync() {
+        public async Task SetVersionListAsync() {
             var response = await RestClient.GetAsync($"{APIBaseURL}/project/{Id}/version");
-            var url = JArray.Parse(response)[0]?["files"]?[0]?["url"]?.ToString();
-            Console.WriteLine($"Downloading plugin {Title} by {Author} from {url}");
+            if (string.IsNullOrEmpty(response)) return;
+            PluginVersions = JsonConvert.DeserializeObject<List<PluginVersion>>(response).ToArray();
         }
     }
 }

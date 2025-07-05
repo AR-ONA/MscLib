@@ -29,7 +29,7 @@ namespace MscLib.Types {
             }
         }
 
-        private string VersionString;
+        internal string VersionString;
         private int Major;
         private int Minor;
         private int Patch;
