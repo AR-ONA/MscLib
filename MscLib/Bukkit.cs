@@ -1,4 +1,4 @@
-﻿using MscLib.Types;
+﻿using MscLib.Versions;
 
 namespace MscLib {
     public class Bukkit {

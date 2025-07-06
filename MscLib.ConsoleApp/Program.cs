@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using MscLib;
-using MscLib.Types;
+using MscLib.Versions;
 
 await Init();
 var plugins = await Plugin.SearchPluginsAsync("WorldEdit", 1, [new BukkitVersion("1.21.5")]);

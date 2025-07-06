@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
 
-namespace MscLib.Types {
+namespace MscLib.Versions {
     public class BukkitVersion {
         internal protected static BukkitVersion[] BukkitVersions { get; private set; }
         private static readonly string APIBaseURL = "https://api.papermc.io/v2/";
@@ -14,7 +14,7 @@ namespace MscLib.Types {
                     BukkitVersions = Array.Empty<BukkitVersion>(); return;
                 }
 
-                var versionStrings = JsonConvert.DeserializeObject<string[]>(versionsObj.ToString() ?? String.Empty) ?? Array.Empty<string>();
+                var versionStrings = JsonConvert.DeserializeObject<string[]>(versionsObj.ToString() ?? string.Empty) ?? Array.Empty<string>();
 
                 BukkitVersions = versionStrings
                     .Where(v => !string.IsNullOrWhiteSpace(v) && v != "1.13-pre7")

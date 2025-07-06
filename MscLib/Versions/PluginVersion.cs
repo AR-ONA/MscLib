@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MscLib.Types {
+namespace MscLib.Versions {
     public class PluginVersion {
         [JsonProperty("id")]
         public string Id { get; internal set; }
