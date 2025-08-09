@@ -17,22 +17,36 @@ namespace MscLib.Types {
         arm,           // arm 64bit and arm 32bit
         aarch64,       // arm 64bit
         aarch32,       // arm 32bit
-        aarch32sf,     // arm 32bit soft float
-        aarch32hf,     // arm 32bit hard float
+    }
+    public static class ArchitectureInfo {
+        public static Arch GetProcessArch() {
+            string archString = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+            return MapStringToArch(archString);
+        }
 
-        // PPC
-        ppc,           // ppc 64bit and ppc 32bit
-        ppc64,         // ppc 64bit
-        ppc64hf,       // ppc 64bit
-        ppc32,         // ppc 32bit
-        ppc32spe,      // ppc 32bit spe
-        ppc32hf,       // ppc 32bit hard float
+        public static Arch GetOperatingSystemArch() {
+            string archString = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432");
 
-        // SPARC
-        sparc,         // sparc 64bit and sparc 32bit
-        sparc32,       // sparc 32bit
-        sparcv9,       // sparcv9 64bit and sparcv9 32bit
-        [EnumMember(Value = "sparcv9-64")]
-        sparcv9_64     // sparcv9 64bit
+            if (string.IsNullOrEmpty(archString)) {
+                archString = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+            }
+
+            return MapStringToArch(archString);
+        }
+
+        private static Arch MapStringToArch(string archString) {
+            switch (archString?.ToUpperInvariant()) {
+                case "AMD64":
+                    return Arch.amd64;
+                case "X86":
+                    return Arch.i686;
+                case "ARM64":
+                    return Arch.aarch64;
+                case "ARM":
+                     return Arch.aarch32;
+                default:
+                    throw new NotSupportedException($"The processor architecture '{archString}' is not supported.");
+            }
+        }
     }
 }

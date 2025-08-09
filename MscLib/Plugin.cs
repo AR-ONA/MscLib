@@ -52,10 +52,17 @@ namespace MscLib {
             return JsonConvert.DeserializeObject<List<PluginVersion>>(response).ToArray();
         }
 
-        public async Task SetVersionListAsync() {
-            var response = await RestClient.GetAsync($"{APIBaseURL}/project/{Id}/version");
-            if (string.IsNullOrEmpty(response)) return;
-            PluginVersions = JsonConvert.DeserializeObject<List<PluginVersion>>(response).ToArray();
+        public async Task<PluginVersion?> GetLatestVersionAsync(BukkitVersion bukkitVersion) {
+            if (PluginVersions == null) {
+                PluginVersions = await GetVersionListAsync();
+            }
+            var versions = PluginVersions
+                .Where(v => v.GameVersions.Contains(bukkitVersion.GetVersionString()))
+                .OrderByDescending(v => v.VersionNumber)
+                .ToArray();
+            return versions.FirstOrDefault();
         }
+
+        public async Task SetVersionListAsync() { PluginVersions = await GetVersionListAsync(); }
     }
 }

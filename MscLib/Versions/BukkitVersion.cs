@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using MscLib.Types;
+using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace MscLib.Versions {
     public class BukkitVersion {
@@ -20,9 +22,6 @@ namespace MscLib.Versions {
                     .Where(v => !string.IsNullOrWhiteSpace(v) && v != "1.13-pre7")
                     .Select(v => new BukkitVersion(v))
                     .ToArray();
-
-                Console.WriteLine($"Loaded {BukkitVersions.Length} versions:");
-                foreach (var bukkitVersion in BukkitVersions) Console.WriteLine(bukkitVersion.ToString());
             }
             catch (Exception ex) {
                 BukkitVersions = Array.Empty<BukkitVersion>();
@@ -34,6 +33,8 @@ namespace MscLib.Versions {
         private int Minor;
         private int Patch;
         private int Build;
+
+        public Arch Architecture = ArchitectureInfo.GetOperatingSystemArch();
 
         public BukkitVersion(string version) {
             VersionString = version;

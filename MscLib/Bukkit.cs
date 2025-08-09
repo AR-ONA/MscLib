@@ -1,9 +1,11 @@
-﻿using MscLib.Versions;
+﻿using MscLib.Types;
+using MscLib.Versions;
 
 namespace MscLib {
     public class Bukkit {
         public BukkitVersion BukkitVersion { get; internal set; }
         public Plugin[] Plugins { get; internal set; } = Array.Empty<Plugin>();
+        public JavaVersion JavaVersion { get; internal set; }
         public bool isCreated { get; internal set; } = false;
         internal int MemoryAmount = 4096;
 
@@ -35,15 +37,25 @@ namespace MscLib {
             return this;
         }
 
+        public BukkitBuilder SetJavaVersion(JavaVersion javaVersion) {
+            Bukkit.JavaVersion = javaVersion;
+            return this;
+        }
+
         public BukkitBuilder SetPlugins(Plugin[] plugins) {
             Bukkit.Plugins = plugins;
+            return this;
+        }
+        public BukkitBuilder SetArchitecture(Arch arch) {
+            Bukkit.BukkitVersion.Architecture = arch;
             return this;
         }
 
         public async Task<Bukkit> BuildAsync() {
             await Bukkit.BukkitVersion.SetBuildAsync();
-            foreach (Plugin plugin in Bukkit.Plugins) {
-                await plugin.SetVersionListAsync();
+            await Bukkit.SetPluginsAsync(Bukkit.Plugins);
+            if (Bukkit.JavaVersion == null) {
+                Bukkit.JavaVersion = await JavaVersion.GetJavaVersionFromBukkitVersionAsync(Bukkit.BukkitVersion);
             }
             return Bukkit;
         }

@@ -9,6 +9,7 @@ namespace MscLib {
     public class Core {
         public static async Task InitAsync() {
             await BukkitVersion.LoadVersionsAsync();
+            await JavaVersion.LoadVersionsInfoAsync();
         }
     }
 }
