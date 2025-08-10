@@ -6,7 +6,7 @@ namespace MscLib.Versions {
     public class JavaVersion {
         internal protected static VersionInfo[] JavaVersionsInfo { get; private set; }
         internal static async Task LoadVersionsInfoAsync() {
-            string manifestUrl = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
+            var manifestUrl = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
             var jsonString = await RestClient.GetAsync(manifestUrl);
 
             var manifest = JsonConvert.DeserializeObject<VersionManifest>(jsonString);
@@ -19,10 +19,21 @@ namespace MscLib.Versions {
         }
 
         public Arch architecture = ArchitectureInfo.GetOperatingSystemArch();        // Default
+        public OSType osType = OSTypeInfo.GetCurrentOs();                            // Default
         public string majorVersion = "17";  // Me too!
 
         public JavaVersion(string majorVersion) {
             this.majorVersion = majorVersion;
+        }
+        public async Task SetJavaManifestAsync() {
+            // Console.WriteLine(JavaVersionsInfo);
+        }
+
+        public Uri GetDownloadUrl() {
+            return new Uri($"https://api.adoptium.net/v3/binary/latest/{majorVersion}" +
+                $"/ga/{OSTypeInfo.ToAdoptiumString(osType)}/" +
+                $"{ArchitectureInfo.ToAdoptiumString(architecture)}" +
+                $"/jre/hotspot/normal/eclipse?project=jdk");
         }
 
         public async static Task<JavaVersion> GetJavaVersionFromBukkitVersionAsync(BukkitVersion bukkitVersion) {
@@ -32,7 +43,8 @@ namespace MscLib.Versions {
             var majorVersion = JObject.Parse(versionJson).SelectToken("javaVersion.majorVersion").Value<int>();
             
             return new JavaVersion(majorVersion.ToString()) {
-                architecture = bukkitVersion.Architecture
+                architecture = bukkitVersion.Architecture,
+                osType = bukkitVersion.OSType
             };
         }
     }

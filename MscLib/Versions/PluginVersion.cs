@@ -15,8 +15,8 @@ namespace MscLib.Versions {
         [JsonProperty("files")]
         public List<PluginFile> Files { get; set; }
 
-        public async Task DownloadAsync() {
-
+        public Uri GetDownloadUrl() {
+            return new Uri(Files.FirstOrDefault()?.Url ?? string.Empty);
         }
     }
 

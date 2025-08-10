@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MscLib.Types {
+﻿namespace MscLib.Types {
     public enum Arch {
         // x86
-        x86,           // x86 64bit and x86 32bit
+        x86,           // x86 32bit
         x64,           // x86 64bit
-        amd64,         // x86 64bit
-        i686,          // x86 32bit
 
         // ARM
-        arm,           // arm 64bit and arm 32bit
-        aarch64,       // arm 64bit
-        aarch32,       // arm 32bit
+        Arm,           // arm 32bit
+        Aarch64,       // arm 64bit
     }
     public static class ArchitectureInfo {
         public static Arch GetProcessArch() {
@@ -34,16 +24,26 @@ namespace MscLib.Types {
             return MapStringToArch(archString);
         }
 
+        public static string ToAdoptiumString(Arch arch) {
+            return arch switch {
+                Arch.x86 => "x86",
+                Arch.x64 => "x64",
+                Arch.Arm => "arm",
+                Arch.Aarch64 => "aarch64",
+                _ => throw new ArgumentOutOfRangeException(nameof(arch), arch, null)
+            };
+        }
+
         private static Arch MapStringToArch(string archString) {
             switch (archString?.ToUpperInvariant()) {
                 case "AMD64":
-                    return Arch.amd64;
+                    return Arch.x64;
                 case "X86":
-                    return Arch.i686;
+                    return Arch.x86;
                 case "ARM64":
-                    return Arch.aarch64;
+                    return Arch.Aarch64;
                 case "ARM":
-                     return Arch.aarch32;
+                     return Arch.Arm;
                 default:
                     throw new NotSupportedException($"The processor architecture '{archString}' is not supported.");
             }

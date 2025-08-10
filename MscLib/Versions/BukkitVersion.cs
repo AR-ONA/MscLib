@@ -35,6 +35,7 @@ namespace MscLib.Versions {
         private int Build;
 
         public Arch Architecture = ArchitectureInfo.GetOperatingSystemArch();
+        public OSType OSType = OSTypeInfo.GetCurrentOs();
 
         public BukkitVersion(string version) {
             VersionString = version;
@@ -59,6 +60,10 @@ namespace MscLib.Versions {
 
         public async Task SetBuildAsync() {
             Build = await GetBuildAsync(this);
+        }
+
+        public Uri GetDownloadUri() {
+            return new Uri($"{APIBaseURL}projects/paper/versions/{VersionString}/builds/{Build}/downloads/paper-{VersionString}-{Build}.jar");
         }
 
         internal protected async Task<int> GetBuildAsync(BukkitVersion version) {

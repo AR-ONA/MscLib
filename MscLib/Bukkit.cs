@@ -51,6 +51,11 @@ namespace MscLib {
             return this;
         }
 
+        public BukkitBuilder SetOSType(OSType os) {
+            Bukkit.BukkitVersion.OSType = os;
+            return this;
+        }
+
         public async Task<Bukkit> BuildAsync() {
             await Bukkit.BukkitVersion.SetBuildAsync();
             await Bukkit.SetPluginsAsync(Bukkit.Plugins);
