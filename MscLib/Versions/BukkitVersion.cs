@@ -66,6 +66,13 @@ namespace MscLib.Versions {
             return new Uri($"{APIBaseURL}projects/paper/versions/{VersionString}/builds/{Build}/downloads/paper-{VersionString}-{Build}.jar");
         }
 
+        public async Task DownloadBukkitAsync(string path) {
+            if (Build == 0) {
+                await SetBuildAsync();
+            }
+            await RestClient.DownloadAsync(GetDownloadUri(), path);
+        }
+
         internal protected async Task<int> GetBuildAsync(BukkitVersion version) {
             int[] versions;
 

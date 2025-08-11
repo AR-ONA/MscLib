@@ -7,7 +7,8 @@ namespace MscLib {
         public Plugin[] Plugins { get; internal set; } = Array.Empty<Plugin>();
         public JavaVersion JavaVersion { get; internal set; }
         public bool isCreated { get; internal set; } = false;
-        internal int MemoryAmount = 4096;
+        public string FilePath { get; internal set; } = string.Empty;
+        public int MemoryAmount { get; internal set; } = 4096;
 
         internal Bukkit(BukkitVersion version) {
             BukkitVersion = version;
@@ -20,8 +21,21 @@ namespace MscLib {
             }
         }
 
-        public int GetMemoryAmount() {
-            return MemoryAmount;
+        public async Task CreateServer() {
+            if (isCreated) return;
+
+            isCreated = true;
+            if (!string.IsNullOrEmpty(FilePath) && !Directory.Exists(FilePath)) {
+                Directory.CreateDirectory(FilePath);
+            }
+            
+            var jrePath = Path.Combine(FilePath, "jre");
+            var downloadedPath = await JavaVersion.DownloadJREAsync(jrePath);
+            await Utils.UnzipAsync(downloadedPath, jrePath, "jre");
+            await BukkitVersion.DownloadBukkitAsync(FilePath);
+            foreach (Plugin plugin in Plugins) {
+                await plugin.DownloadAsync(Path.Combine(FilePath, "plugins"), BukkitVersion);
+            }
         }
     }
 
@@ -56,7 +70,16 @@ namespace MscLib {
             return this;
         }
 
+        public BukkitBuilder SetLocation(string location) {
+            Bukkit.FilePath = location;
+            return this;
+        }
+
         public async Task<Bukkit> BuildAsync() {
+            if (Bukkit.FilePath == string.Empty) {
+                Bukkit.FilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "MscLib", "Bukkit", Bukkit.BukkitVersion.GetVersionString() + "_" + Guid.NewGuid().ToString());
+            }
             await Bukkit.BukkitVersion.SetBuildAsync();
             await Bukkit.SetPluginsAsync(Bukkit.Plugins);
             if (Bukkit.JavaVersion == null) {

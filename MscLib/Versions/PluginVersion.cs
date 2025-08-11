@@ -18,6 +18,11 @@ namespace MscLib.Versions {
         public Uri GetDownloadUrl() {
             return new Uri(Files.FirstOrDefault()?.Url ?? string.Empty);
         }
+
+        public async Task DownloadAsync(string filePath) {
+            if (Files.Count == 0) throw new InvalidOperationException("No files available for download.");
+            await RestClient.DownloadAsync(GetDownloadUrl(), filePath);
+        }
     }
 
     public class PluginFile {

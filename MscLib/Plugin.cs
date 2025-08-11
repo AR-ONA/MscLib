@@ -18,15 +18,20 @@ namespace MscLib {
             {
                 new List<string> { "project_type:plugin" },
                 new List<string> { "categories:paper", "categories:spigot" },
+                new List<string> { "categories!=neoforge" },
+                new List<string> { "categories!=fabric" },
                 bukkitVersions.Select(v => $"versions:{v.GetVersionString()}").ToList()
             };
             var facetsString = JsonConvert.SerializeObject(facets);
 
             var response = await RestClient.GetAsync($"{APIBaseURL}/search?query={query}&facets={facetsString}&index=newest&limit={limit}");
             var json = JObject.Parse(response)["hits"];
-            return json != null
+
+            var plugins = json != null
                 ? json.ToObject<Plugin[]>() ?? Array.Empty<Plugin>()
                 : Array.Empty<Plugin>();
+
+            return plugins;
         }
 
         public bool IsDownloaded { get; internal set; } = false;
@@ -47,10 +52,14 @@ namespace MscLib {
         }
 
         public async Task<PluginVersion[]> GetVersionListAsync() {
-            var response = await RestClient.GetAsync($"{APIBaseURL}/project/{Id}/version");
+            var url = $"{APIBaseURL}/project/{Id}/version?loaders=[\"paper\",\"spigot\"]";
+
+            var response = await RestClient.GetAsync(url);
             if (string.IsNullOrEmpty(response)) return Array.Empty<PluginVersion>();
+
             return JsonConvert.DeserializeObject<List<PluginVersion>>(response).ToArray();
         }
+
 
         public async Task<PluginVersion?> GetLatestVersionAsync(BukkitVersion bukkitVersion) {
             if (PluginVersions == null) {
@@ -61,6 +70,13 @@ namespace MscLib {
                 .OrderByDescending(v => v.VersionNumber)
                 .ToArray();
             return versions.FirstOrDefault();
+        }
+
+        public async Task DownloadAsync(string filePath, BukkitVersion bukkitVersion) {
+            var version = await GetLatestVersionAsync(bukkitVersion);
+            if (version == null) return;
+            IsDownloaded = true;
+            await version.DownloadAsync(filePath);
         }
 
         public async Task SetVersionListAsync() { PluginVersions = await GetVersionListAsync(); }

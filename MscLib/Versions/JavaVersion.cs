@@ -25,8 +25,8 @@ namespace MscLib.Versions {
         public JavaVersion(string majorVersion) {
             this.majorVersion = majorVersion;
         }
-        public async Task SetJavaManifestAsync() {
-            // Console.WriteLine(JavaVersionsInfo);
+        public async Task<string> DownloadJREAsync(string filePath) {
+            return await RestClient.DownloadAsync(GetDownloadUrl(), filePath);
         }
 
         public Uri GetDownloadUrl() {
