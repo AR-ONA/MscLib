@@ -22,13 +22,18 @@ namespace MscLib {
         }
 
         public async Task CreateServer() {
+            await DownloadFiles();
+
+        }
+
+        public async Task DownloadFiles() {
             if (isCreated) return;
 
             isCreated = true;
             if (!string.IsNullOrEmpty(FilePath) && !Directory.Exists(FilePath)) {
                 Directory.CreateDirectory(FilePath);
             }
-            
+
             var jrePath = Path.Combine(FilePath, "jre");
             var downloadedPath = await JavaVersion.DownloadJREAsync(jrePath);
             await Utils.UnzipAsync(downloadedPath, jrePath, "jre");
